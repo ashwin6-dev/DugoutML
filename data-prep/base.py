@@ -55,3 +55,14 @@ class WicketCounter(WicketFeature):
 class WicketTotaller(WicketFeature):
     def __init__(self, group_on, feat_name):
         super().__init__(TotalSum, group_on, feat_name)
+
+class ChaseTarget:
+    def __init__(self, feat_name):
+        self.feat_name = feat_name
+
+    def apply(self, df):
+        target_values = df.groupby(["match_id", "innings"])["innings_final_runs"].max().unstack()[1]
+        df.loc[df['innings'] == 2, self.feat_name] = df['match_id'].map(target_values) + 1
+        df[self.feat_name] = df[self.feat_name].fillna(0)
+
+        return df
